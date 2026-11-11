@@ -7,6 +7,7 @@ import EstimateLink from '../components/EstimateLink.astro';
 import { brand, navigation, services, estimateUrl } from '../lib/content';
 const { title, description, image = 'hero', home = false } = Astro.props;
 const isEstimate = Astro.url.pathname === estimateUrl;
+const estimateService = services.find(service => Astro.url.pathname === `/services/${service.slug}/`)?.slug;
 const pageTitle = home ? `${brand.name} | Roofing in ${brand.city}, ${brand.state}` : `${title} | ${brand.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const indexable = import.meta.env.PUBLIC_INDEXABLE === 'true';
@@ -60,6 +61,7 @@ const indexable = import.meta.env.PUBLIC_INDEXABLE === 'true';
     <div class="footer-bottom wrap"><span>© {new Date().getFullYear()} {brand.name}</span>{brand.demo && <span>Fictional contractor demo · Illustrative imagery</span>}</div>
     <div class="footer-word" aria-hidden="true">{brand.short}</div>
   </footer>
+  {!isEstimate && <div class="mobile-estimate"><EstimateLink service={estimateService}/></div>}
   <script>
     const menu = document.querySelector<HTMLElement>('#menu')!;
     const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;

@@ -20,6 +20,7 @@ import { brand, services, details, faqs } from '../lib/content';
         <div class="hero-copy">
           <p class="eyebrow hero-local"><i></i> {brand.city}, {brand.state} / {brand.region}</p>
           <h1><span><b>Built to</b></span> <span><b>weather</b></span> <span><b>what’s next<span class="accent">.</span></b></span></h1>
+          <p class="hero-summary">Roof repair, replacement, and storm damage help in {brand.city}, {brand.state}.</p>
           <div class="hero-actions"><EstimateLink/><a class="button ghost" href="#projects">Explore Projects <Icon name="down" size={15}/></a></div>
         </div>
         <a class="hero-feature" href="#workmanship" aria-label="Explore workmanship photo sequence">
@@ -63,12 +64,15 @@ import { brand, services, details, faqs } from '../lib/content';
     </div>
   </section>
 
-  <section class="projects-section section-space" id="projects">
-    <div class="wrap"><Gallery/></div>
+  <section class="comparison-section section-space" aria-label="Roof before and after">
     <div class="comparison-wrap wrap" data-reveal>
-      <div><p class="eyebrow"><i></i> Project in focus</p><h3>A new roof.<br/> The same home<span class="accent">.</span></h3><p>See what a charcoal shingle can do for a familiar roofline. This example illustrates an aging roof and a proposed replacement.</p><a class="text-link" href="/projects/cedar-ridge-residence/">Explore Cedar Ridge <Icon size={16}/></a></div>
+      <div><p class="eyebrow"><i></i> Project in focus</p><h2>A new roof.<br/> The same home<span class="accent">.</span></h2><p>See what a charcoal shingle can do for a familiar roofline. This example illustrates an aging roof and a proposed replacement.</p><a class="text-link" href="/projects/cedar-ridge-residence/">Explore Cedar Ridge <Icon size={16}/></a></div>
       <Comparison/>
     </div>
+  </section>
+
+  <section class="projects-section section-space" id="projects">
+    <div class="wrap"><Gallery/></div>
   </section>
 
   <section class="craft-section section-space" id="workmanship">
