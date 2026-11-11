@@ -1,0 +1,128 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import { brand, services } from '../lib/content';
+---
+<Layout title="Request an Estimate" description={`Tell ${brand.name} what is happening with your roof, siding, or gutters.`}>
+  <section class="estimate-layout wrap">
+    <div class="estimate-intro"><p class="eyebrow"><i></i> Start here / {brand.city}, {brand.state}</p><h1>Request an estimate<span class="accent">.</span></h1><p>Tell us what you’ve noticed and where the property is. That gives us a starting point for the estimate conversation.</p>
+      <div class="estimate-image"><Media name="hero" sizes="(min-width: 768px) 42vw, 90vw"/></div>
+    </div>
+    <div class="form-card">
+      <h2>Project details</h2>
+      {brand.demo && <p class="demo-notice"><i></i> Demo mode. Use sample details. This form simulates a submission.</p>}
+      <noscript><p class="demo-notice">Enable JavaScript to submit this form.</p></noscript>
+      <form id="estimate-form" method="post" action="/api/estimate/" novalidate>
+        <p id="form-error" class="form-error" role="alert" tabindex="-1" hidden></p>
+        <div class="form-field"><label for="estimate-name">Name</label><input name="name" id="estimate-name" autocomplete="name" maxlength="100" required aria-describedby="error-name" placeholder="Your full name"/><span id="error-name" class="field-error"></span></div>
+        <div class="form-field"><label for="estimate-contact">Email or phone</label><input name="contact" id="estimate-contact" maxlength="200" required aria-describedby="error-contact" placeholder="you@example.com or (555) 010-1234"/><span id="error-contact" class="field-error"></span></div>
+        <div class="form-row">
+          <div class="form-field"><label for="estimate-zip">ZIP code</label><input name="zip" id="estimate-zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" required aria-describedby="error-zip" placeholder="37064"/><span id="error-zip" class="field-error"></span></div>
+          <div class="form-field"><label for="estimate-service">Service needed</label><select name="service" id="estimate-service" required aria-describedby="error-service"><option value="">Choose a service</option>{services.map(item => <option value={item.slug}>{item.name}</option>)}<option value="unsure">I’m not sure</option></select><span id="error-service" class="field-error"></span></div>
+        </div>
+        <div class="form-field"><label for="estimate-description">What’s happening?</label><textarea name="description" id="estimate-description" rows="4" maxlength="1000" required aria-describedby="error-description" placeholder="For example, a ceiling stain appeared after heavy rain."></textarea><span id="error-description" class="field-error"></span></div>
+        <button class="button" type="submit">Submit estimate request <Icon size={17}/></button>
+      </form>
+      <section id="estimate-success" tabindex="-1" hidden>
+        <p class="eyebrow"><i></i> Submission summary</p><h3 id="success-title"></h3><p id="success-message"></p>
+        <dl id="success-details"></dl>
+        <button type="button" class="button" id="another-estimate">Start another request <Icon size={17}/></button>
+      </section>
+    </div>
+  </section>
+</Layout>
+<script>
+  import { estimateFields, parseEstimate, validateEstimate, type EstimateErrors } from '../lib/estimate';
+  const form = document.querySelector<HTMLFormElement>('#estimate-form')!;
+  const errorSummary = document.querySelector<HTMLElement>('#form-error')!;
+  const success = document.querySelector<HTMLElement>('#estimate-success')!;
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+  const select = form.querySelector<HTMLSelectElement>('select')!;
+  const selected = new URLSearchParams(location.search).get('service');
+  if (selected && Array.from(select.options).some(option => option.value === selected)) select.value = selected;
+  let attempt: { payload: string; key: string } | undefined;
+
+  function showErrors(errors: EstimateErrors) {
+    for (const field of estimateFields) {
+      const control = form.elements.namedItem(field) as HTMLInputElement;
+      document.querySelector(`#error-${field}`)!.textContent = errors[field] ?? '';
+      if (errors[field]) control.setAttribute('aria-invalid', 'true');
+      else control.removeAttribute('aria-invalid');
+    }
+  }
+
+  function announce(message: string) {
+    errorSummary.hidden = !message;
+    errorSummary.textContent = message;
+    if (message) errorSummary.focus();
+  }
+
+  form.addEventListener('input', event => {
+    const control = event.target;
+    if (!(control instanceof HTMLElement) || control.getAttribute('aria-invalid') !== 'true') return;
+    const field = estimateFields.find(name => name === control.getAttribute('name'));
+    if (!field || validateEstimate(parseEstimate(new FormData(form)))[field]) return;
+    control.removeAttribute('aria-invalid');
+    document.querySelector(`#error-${field}`)!.textContent = '';
+    if (!form.querySelector('[aria-invalid=true]')) announce('');
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    announce('');
+    const values = parseEstimate(new FormData(form));
+    const errors = validateEstimate(values);
+    showErrors(errors);
+    if (Object.keys(errors).length) {
+      announce('Please correct the highlighted fields.');
+      return;
+    }
+    const serviceLabel = select.selectedOptions[0].textContent;
+    submit.disabled = true;
+    const payload = JSON.stringify(values);
+    if (attempt?.payload !== payload) attempt = { payload, key: crypto.randomUUID() };
+    try {
+      const response = await fetch('/api/estimate/', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': attempt.key },
+        body: payload, signal: AbortSignal.timeout(12000),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        if (result.errors) showErrors(result.errors);
+        announce(result.message ?? 'Please correct the highlighted fields and try again.');
+        return;
+      }
+      document.querySelector('#success-title')!.textContent = result.simulated ? 'Demo request complete.' : 'Estimate request received.';
+      document.querySelector('#success-message')!.textContent = result.simulated
+        ? 'Your submission was simulated. Nothing was sent.'
+        : 'Here’s a copy of the information you provided.';
+      const summary = document.querySelector('#success-details')!;
+      summary.replaceChildren();
+      const labels = ['Name', 'Email or phone', 'ZIP code', 'Service', 'Description'];
+      estimateFields.forEach((field, index) => {
+        const label = document.createElement('dt');
+        const value = document.createElement('dd');
+        label.textContent = labels[index];
+        value.textContent = field === 'service' ? serviceLabel : values[field];
+        summary.append(label, value);
+      });
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+      attempt = undefined;
+    } catch {
+      announce('The connection was interrupted. Your details are still here. Please try again.');
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  document.querySelector('#another-estimate')!.addEventListener('click', () => {
+    form.reset();
+    success.hidden = true;
+    form.hidden = false;
+    document.querySelector<HTMLInputElement>('#estimate-name')!.focus();
+  });
+</script>

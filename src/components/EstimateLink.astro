@@ -1,0 +1,6 @@
+---
+import Icon from './Icon.astro';
+import { estimateUrl } from '../lib/content';
+const { service, class: className = '', label = 'Request an Estimate' } = Astro.props;
+---
+<a class:list={['button', className]} href={service ? `${estimateUrl}?service=${encodeURIComponent(service)}` : estimateUrl}>{label}<Icon size={16}/></a>

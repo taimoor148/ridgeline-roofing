@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { brand } from '../lib/content';
+---
+<Layout title="Page not found" description={`Find your way back to ${brand.name}.`}>
+  <PageIntro label="404" title="This roofline ends here" description="That page could have moved. Return home to explore services and projects."><a class="button" href="/">Back to home</a></PageIntro>
+</Layout>

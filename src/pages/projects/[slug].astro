@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import Comparison from '../../components/Comparison.astro';
+import Icon from '../../components/Icon.astro';
+import Closing from '../../components/Closing.astro';
+import { projects } from '../../lib/content';
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { slug: project.slug }, props: { project } }));
+}
+const { project } = Astro.props;
+---
+<Layout title={project.name} description={project.intro} image={project.image}>
+  <PageIntro label={`Illustrative project / ${project.type}`} title={project.name} description={project.intro} image={project.image}/>
+  <section class="wrap section-space detail-split">
+    <div><p class="eyebrow"><i></i> The starting point</p><h2>The challenge<span class="accent">.</span></h2><p>{project.challenge}</p></div>
+    <div><p class="eyebrow"><i></i> The proposal</p><h2>The approach<span class="accent">.</span></h2><p>{project.approach}</p><a class="text-link" href="/projects/">Back to all projects <Icon size={16}/></a></div>
+  </section>
+  {project.compare && <section class="wrap project-compare"><Comparison/></section>}
+  <Closing/>
+</Layout>

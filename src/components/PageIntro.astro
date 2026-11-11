@@ -1,0 +1,10 @@
+---
+import Media from './Media.astro';
+const { label, title, description, image } = Astro.props;
+---
+<section class:list={['page-intro', image && 'with-image']}>
+  {image && <Media name={image} eager sizes="100vw"/>}
+  <div class="wrap">
+    <p class="eyebrow"><i></i> {label}</p><h1>{title}<span class="accent">.</span></h1><p>{description}</p><slot/>
+  </div>
+</section>

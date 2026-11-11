@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Steps from '../components/Steps.astro';
+import Closing from '../components/Closing.astro';
+import { brand } from '../lib/content';
+const { verified } = brand;
+const credentials = [['Rating', verified.rating], ['License', verified.license], ['Insurance', verified.insurance], ['Warranty', verified.warranty]].filter(([,value]) => value);
+---
+<Layout title="About" description={`Learn how ${brand.name} approaches residential exterior work.`}>
+  <PageIntro label={`About ${brand.short}`} title="Good work starts with a clear plan" description="Your roof is part of a system. We look at how water and air move around the entire exterior before recommending work on one part of it." image="ranch"/>
+  <section class="wrap section-space detail-split"><div><p class="eyebrow"><i></i> Our approach</p><h2>Details you can understand<span class="accent">.</span></h2></div><div><p>Homeowners deserve to know which details need attention, what the scope includes, and what could change once work begins. The estimate and final walkthrough give you two chances to ask those questions.</p>{brand.demo && <p>{brand.name} is a fictional contractor created to demonstrate a residential roofing and exterior website.</p>}</div></section>
+  {(credentials.length > 0 || verified.reviews.length > 0) && <section class="wrap section-space"><h2>Credentials & reviews<span class="accent">.</span></h2><dl>{credentials.map(([label,value]) => <><dt>{label}</dt><dd>{value}</dd></>)}</dl>{verified.reviews.map(review => <blockquote><p>{review.quote}</p><cite>{review.author}</cite></blockquote>)}</section>}
+  <section class="process-section section-space"><div class="wrap"><p class="eyebrow"><i></i> The process</p><h2>How it works<span class="accent">.</span></h2><Steps/></div></section>
+  <Closing/>
+</Layout>

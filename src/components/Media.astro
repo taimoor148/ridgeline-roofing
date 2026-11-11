@@ -1,0 +1,6 @@
+---
+interface Props { name: string; alt?: string; class?: string; eager?: boolean; sizes?: string; }
+const { name, alt = '', class: className, eager = false, sizes = '100vw' } = Astro.props;
+const widths = name === 'hero' ? [480, 800, 1200, 1536] : ['before','after'].includes(name) ? [480, 800] : [480];
+---
+<img class={className} src={`/media/${name}-${widths.at(-1)}.webp`} srcset={widths.map(width => `/media/${name}-${width}.webp ${width}w`).join(', ')} {sizes} {alt} loading={eager ? 'eager' : 'lazy'} decoding={eager ? 'sync' : 'async'} fetchpriority={eager ? 'high' : undefined} draggable="false" />

@@ -1,0 +1,12 @@
+---
+const { name = 'arrow', size = 20 } = Astro.props;
+---
+<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {name === 'mark' ? <><path d="M2 16 11.8 6 22 16M5.5 19 12 12l6.5 7"/><path d="M16 6h3v4"/></> :
+   name === 'menu' ? <path d="M3 8h18M3 15h18"/> :
+   name === 'right' ? <path d="M3 12h17m-6-6 6 6-6 6"/> :
+   name === 'left' ? <path d="M21 12H4m6-6-6 6 6 6"/> :
+   name === 'down' ? <path d="M12 4v16m-6-6 6 6 6-6"/> :
+   name === 'play' ? <path d="m9 5 11 7-11 7Z" fill="currentColor" stroke="none"/> :
+   <path d="M5 19 19 5M7 5h12v12"/>}
+</svg>

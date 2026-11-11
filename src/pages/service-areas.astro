@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import EstimateLink from '../components/EstimateLink.astro';
+import Closing from '../components/Closing.astro';
+import { brand } from '../lib/content';
+---
+<Layout title="Service Areas" description={`Residential roofing and exteriors in ${brand.city} and nearby ${brand.region} towns.`}>
+  <PageIntro label="05 / Service area" title={`Roofing around ${brand.city}`} description={`Residential roofing, siding, and gutters in ${brand.city}, ${brand.state} and neighboring communities.`} image="hero"><EstimateLink/></PageIntro>
+  <section class="wrap section-space detail-split"><div><p class="eyebrow"><i></i> {brand.region}</p><h2>Close to home<span class="accent">.</span></h2><p>Include your ZIP code when you request an estimate so we can check coverage for your address.</p>{brand.demo && <p>Locations shown are examples for this fictional demo.</p>}</div><ul class="line-list">{[brand.city, ...brand.towns].map(town => <li>{town}, {brand.state}</li>)}</ul></section>
+  <Closing/>
+</Layout>

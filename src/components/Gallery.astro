@@ -1,0 +1,98 @@
+---
+import { brand, projects } from '../lib/content';
+import Media from './Media.astro';
+import Icon from './Icon.astro';
+---
+<project-gallery>
+  <div class="gallery-head" data-reveal>
+    <div><p class="eyebrow"><i></i> 02 / Selected projects</p><h2>See the<br/> difference<span class="accent">.</span></h2></div>
+    <div class="gallery-side"><p>Explore the choices that shape a roofline, from shingle profile to the way siding meets trim.</p><a class="text-link" href="/projects/">All projects <Icon size={16}/></a></div>
+  </div>
+  <div class="gallery-rail" tabindex="0" role="region" aria-label="Featured projects. Use left and right arrow keys to browse.">
+    {projects.map((project, index) => (
+      <a class="project-card" draggable="false" href={`/projects/${project.slug}/`}>
+        <div class="project-img"><Media name={project.image} sizes="(min-width: 900px) 50vw, 85vw"/><span class="stamp">Illustrative project</span><span class="project-arrow"><Icon/></span></div>
+        <div class="project-caption"><div><small>{project.type} / {([brand.city, ...brand.towns][project.area] ?? brand.city)}, {brand.state}</small><h3>{project.name}</h3></div><span class="mono">0{index + 1}</span></div>
+      </a>
+    ))}
+  </div>
+  <div class="gallery-controls">
+    <span class="gallery-hint eyebrow">← Drag to explore →</span>
+    <div class="gallery-progress" aria-hidden="true"><span></span></div>
+    <div class="gallery-buttons">
+      <span class="mono gallery-count" aria-live="polite">01 / 0{projects.length}</span>
+      <button class="round" data-previous aria-label="Previous project" disabled><Icon name="left"/></button>
+      <button class="round" data-next aria-label="Next project"><Icon name="right"/></button>
+    </div>
+  </div>
+</project-gallery>
+<script>
+  class ProjectGallery extends HTMLElement {
+    connectedCallback() {
+      const rail = this.querySelector<HTMLElement>('.gallery-rail')!;
+      const cards = Array.from(rail.querySelectorAll<HTMLElement>('.project-card'));
+      const count = this.querySelector<HTMLElement>('.gallery-count')!;
+      const progress = this.querySelector<HTMLElement>('.gallery-progress span')!;
+      const previous = this.querySelector<HTMLButtonElement>('[data-previous]')!;
+      const next = this.querySelector<HTMLButtonElement>('[data-next]')!;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      let active = 0;
+      let dragStart = 0;
+      let startScroll = 0;
+      let pointer: number | undefined;
+      let dragged = false;
+      const position = (card: HTMLElement) => Math.min(card.offsetLeft - cards[0].offsetLeft, rail.scrollWidth - rail.clientWidth);
+      const sync = () => {
+        active = cards.reduce((closest, card, index) => Math.abs(position(card) - rail.scrollLeft) < Math.abs(position(cards[closest]) - rail.scrollLeft) ? index : closest, 0);
+        cards.forEach((card, index) => card.classList.toggle('active', index === active));
+        count.textContent = `${String(active + 1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
+        progress.style.transform = `scaleX(${(active + 1) / cards.length})`;
+        previous.disabled = active === 0;
+        next.disabled = active === cards.length - 1;
+      };
+      const go = (index: number) => rail.scrollTo({ left: position(cards[Math.max(0, Math.min(index, cards.length - 1))]), behavior: reduce.matches ? 'instant' : 'smooth' });
+      previous.addEventListener('click', () => go(active - 1));
+      next.addEventListener('click', () => go(active + 1));
+      rail.addEventListener('scroll', sync, { passive: true });
+      rail.addEventListener('keydown', event => {
+        if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+        event.preventDefault();
+        const index = event.key === 'Home' ? 0 : event.key === 'End' ? cards.length - 1 : active + (event.key === 'ArrowRight' ? 1 : -1);
+        go(index);
+        if (event.target !== rail) cards[Math.max(0, Math.min(index, cards.length - 1))].focus({ preventScroll: true });
+      });
+      rail.addEventListener('dragstart', event => event.preventDefault());
+      rail.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'mouse' || event.button !== 0) return;
+        dragStart = event.clientX;
+        startScroll = rail.scrollLeft;
+        pointer = event.pointerId;
+        dragged = false;
+      });
+      rail.addEventListener('pointermove', event => {
+        if (event.pointerId !== pointer || !event.buttons) return;
+        const distance = event.clientX - dragStart;
+        if (Math.abs(distance) > 7 && !dragged) {
+          dragged = true;
+          rail.setPointerCapture(event.pointerId);
+          rail.classList.add('dragging');
+        }
+        if (dragged) rail.scrollLeft = startScroll - distance;
+      });
+      const end = () => {
+        pointer = undefined;
+        rail.classList.remove('dragging');
+        if (dragged) {
+          sync();
+          go(active);
+        }
+        setTimeout(() => { dragged = false; }, 0);
+      };
+      rail.addEventListener('pointerup', end);
+      rail.addEventListener('pointercancel', end);
+      rail.addEventListener('click', event => { if (dragged) event.preventDefault(); }, true);
+      sync();
+    }
+  }
+  customElements.define('project-gallery', ProjectGallery);
+</script>

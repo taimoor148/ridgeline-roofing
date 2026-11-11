@@ -1,0 +1,117 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import Media from '../components/Media.astro';
+import EstimateLink from '../components/EstimateLink.astro';
+import Gallery from '../components/Gallery.astro';
+import Comparison from '../components/Comparison.astro';
+import Steps from '../components/Steps.astro';
+import Closing from '../components/Closing.astro';
+import { brand, services, details, faqs } from '../lib/content';
+---
+<Layout home title="Home" description={`Explore roof repair, replacement, siding, and gutters in ${brand.region}. See project concepts and request a roofing estimate.`}>
+  <section class="hero-sequence" aria-label={brand.short + " introduction"}>
+    <div class="hero-stick">
+      <div class="hero-frame frame">
+        <Media name="hero" class="hero-img" eager sizes="(max-width: 700px) 100vw, 97vw"/>
+        <div class="hero-shade"></div>
+        <svg class="hero-linework" viewBox="0 0 510 210" fill="none" aria-hidden="true"><path d="M-20 207 240 18l236 174M88 209 241 96l152 112M192 65l48-35 48 35M240 0v207M0 192h510"/></svg>
+        <div class="hero-meta eyebrow"><span><i></i> Residential roofing & exteriors</span><span>{brand.city}, {brand.state} <span class="accent">/</span> {brand.region}</span></div>
+        <div class="hero-copy">
+          <p class="eyebrow hero-local"><i></i> {brand.city}, {brand.state} / {brand.region}</p>
+          <h1><span><b>Built to</b></span> <span><b>weather</b></span> <span><b>what’s next<span class="accent">.</span></b></span></h1>
+          <div class="hero-actions"><EstimateLink/><a class="button ghost" href="#projects">Explore Projects <Icon name="down" size={15}/></a></div>
+        </div>
+        <a class="hero-feature" href="#workmanship" aria-label="Explore workmanship photo sequence">
+          <div class="hero-feature-img"><Media name="shingles"/><span><Icon name="play" size={19}/></span></div>
+          <div class="hero-feature-caption"><span><i></i> A closer look</span><Icon size={15}/></div>
+        </a>
+        <div class="hero-next">
+          <p class="eyebrow"><i></i> From ridge to foundation</p>
+          <h2>Every edge<br/> matters<span class="accent">.</span></h2>
+          <p>Roofing, siding, and gutters work together to keep the weather outside.</p>
+        </div>
+      </div>
+    </div>
+    <div class="hero-interlude frame">
+      <p class="eyebrow"><i></i> From ridge to foundation</p><h2>Every edge matters<span class="accent">.</span></h2>
+      <p>Roofing, siding, and gutters work together to keep the weather outside.</p>
+    </div>
+  </section>
+
+  <section class="service-section" id="services">
+    <div class="wrap section-space">
+      <div class="section-heading" data-reveal>
+        <div><p class="eyebrow"><i></i> 01 / What we do</p><h2>Protect what’s<br/> underneath<span class="accent">.</span></h2></div>
+        <p>Whether it’s a leak after last night’s storm or a roof that’s due for replacement, we’ll help you understand what’s happening and what to do next.</p>
+      </div>
+      <div class="service-browser">
+        <div class="service-list">
+          {services.map((service, index) => <a href={`/services/${service.slug}/`} class="service-row" data-service={index}>
+            <div class="service-mobile-image"><Media name={service.image} sizes="92vw"/></div>
+            <div class="service-row-main"><span class="mono">0{index + 1}</span><h3>{service.name}</h3><span class="round"><Icon/></span></div>
+          </a>)}
+          <a class="text-link" href="/services/">View all services <Icon size={16}/></a>
+        </div>
+        <figure class="service-visual">
+          {services.map((service, index) => <div class:list={['service-photo', index === 0 && 'current']} data-service-photo={index}>
+            <Media name={service.image} sizes="40vw"/>
+            <div><span class="mono">0{index + 1} / {service.name}</span><p>{service.summary}</p></div>
+          </div>)}
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="projects-section section-space" id="projects">
+    <div class="wrap"><Gallery/></div>
+    <div class="comparison-wrap wrap" data-reveal>
+      <div><p class="eyebrow"><i></i> Project in focus</p><h3>A new roof.<br/> The same home<span class="accent">.</span></h3><p>See what a charcoal shingle can do for a familiar roofline. This example illustrates an aging roof and a proposed replacement.</p><a class="text-link" href="/projects/cedar-ridge-residence/">Explore Cedar Ridge <Icon size={16}/></a></div>
+      <Comparison/>
+    </div>
+  </section>
+
+  <section class="craft-section section-space" id="workmanship">
+    <div class="wrap">
+      <div class="center-heading" data-reveal><p class="eyebrow"><i></i> 03 / Workmanship</p><h2>Small details.<br/> <span class="accent">Big difference.</span></h2><p>Three places where good installation pays off every time it rains.</p></div>
+      <div class="craft-grid">
+        <div class="craft-sticky">
+          <div class="craft-photo">
+            {details.map((item, index) => <div class:list={['craft-layer', index === 0 && 'current']} data-craft-photo={index}><Media name={item.image} sizes="(min-width: 768px) 50vw, 95vw"/></div>)}
+            <span class="stamp">Field notes / Detail study</span>
+          </div>
+          <div class="craft-tabs" aria-label="Choose a workmanship detail">{details.map((item, index) => <button type="button" data-craft-button={index} aria-pressed={index === 0}>{'0' + (index + 1)} <span>{item.name}</span></button>)}</div>
+        </div>
+        <div class="craft-notes">
+          {details.map((item,index) => <article class:list={[index === 0 && "current"]} id={`detail-${index + 1}`} data-craft-note={index}>
+            <p class="eyebrow"><i></i> Detail 0{index + 1}</p><h3>{item.name}<span class="accent">.</span></h3><p>{item.text}</p>
+          </article>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process-section section-space">
+    <div class="wrap">
+      <div class="section-heading" data-reveal><div><p class="eyebrow"><i></i> 04 / The process</p><h2>Know what<br/> comes next<span class="accent">.</span></h2></div><p>Four straightforward steps from your first question to the final walkthrough.</p></div>
+      <Steps/>
+    </div>
+  </section>
+
+  <section class="area-section">
+    <div class="wrap area-copy" data-reveal><div><p class="eyebrow"><i></i> 05 / Service area</p><h2>Close to home<span class="accent">.</span></h2></div><div><p>Based in {brand.city}, serving homeowners around {brand.region}.</p><a class="text-link" href="/service-areas/">Check service areas <Icon size={16}/></a></div></div>
+    <div class="marquee" aria-label="Service area towns"><div class="marquee-track">
+      {[false,true].map(copy => <div class="marquee-group" aria-hidden={copy ? 'true' : undefined}>{[brand.city, ...brand.towns].map(town => <span>{town} <i aria-hidden="true">✦</i></span>)}</div>)}
+    </div></div>
+    <div class="wrap marquee-footer"><button type="button" id="marquee-pause">Pause town names</button></div>
+  </section>
+
+  <section class="faq-section wrap section-space">
+    <div data-reveal><p class="eyebrow"><i></i> 06 / Common questions</p><h2>Good to<br/> know<span class="accent">.</span></h2></div>
+    <div class="faq-list">{faqs.map(([question, answer]) => <details><summary>{question}<span aria-hidden="true"></span></summary><p>{answer}</p></details>)}</div>
+  </section>
+  <Closing/>
+</Layout>
+<script>
+  import '../lib/home-motion';
+</script>

@@ -1,0 +1,6 @@
+---
+import { processSteps } from '../lib/content';
+---
+<ol class="steps">
+  {processSteps.map((step, i) => <li data-reveal><span class="mono">0{i + 1} /</span><h3>{step.title}</h3><p>{step.text}</p></li>)}
+</ol>

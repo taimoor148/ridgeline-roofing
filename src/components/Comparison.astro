@@ -1,0 +1,29 @@
+---
+import Media from './Media.astro';
+---
+<roof-compare>
+  <figure class="comparison">
+    <div class="compare-stage" style="--split:50%">
+      <Media name="after" alt="The cottage roof with newly installed dark shingles" />
+      <Media name="before" alt="The same cottage roof with faded, weathered shingles" class="compare-before"/>
+      <span class="compare-line" aria-hidden="true"><b>↔</b></span>
+      <span class="stamp before-label">Before</span><span class="stamp after-label">After</span>
+    </div>
+    <div class="compare-tools"><label for="roof-split">Before and after comparison</label><input id="roof-split" type="range" min="0" max="100" value="50" aria-describedby="compare-help"/></div>
+    <figcaption id="compare-help">Illustrative imagery. Use the slider or arrow keys to reveal the two views.</figcaption>
+  </figure>
+</roof-compare>
+<script>
+  customElements.define('roof-compare', class extends HTMLElement {
+    connectedCallback() {
+      const slider = this.querySelector<HTMLInputElement>('input')!;
+      const stage = this.querySelector<HTMLElement>('.compare-stage')!;
+      const update = () => {
+        stage.style.setProperty('--split', `${slider.value}%`);
+        slider.setAttribute('aria-valuetext', `${slider.value}% before, ${100 - Number(slider.value)}% after`);
+      };
+      slider.addEventListener('input', update);
+      update();
+    }
+  });
+</script>

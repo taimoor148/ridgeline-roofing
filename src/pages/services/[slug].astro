@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import EstimateLink from '../../components/EstimateLink.astro';
+import Icon from '../../components/Icon.astro';
+import Steps from '../../components/Steps.astro';
+import { services } from '../../lib/content';
+export function getStaticPaths() {
+  return services.map(service => ({ params: { slug: service.slug }, props: { service } }));
+}
+const { service } = Astro.props;
+---
+<Layout title={service.name} description={service.summary} image={service.image}>
+  <PageIntro label="Residential exterior services" title={service.name} description={service.summary} image={service.image}><EstimateLink service={service.slug}/></PageIntro>
+  <section class="wrap section-space detail-split">
+    <div><p class="eyebrow"><i></i> When to get it checked</p><h2>What to look for<span class="accent">.</span></h2><p>{service.signal}</p></div>
+    <div><p class="eyebrow"><i></i> What the work can include</p><ul class="line-list">{service.scope.map(item => <li>{item}</li>)}</ul><a class="text-link" href="/services/">Explore other services <Icon size={16}/></a></div>
+  </section>
+  <section class="process-section section-space"><div class="wrap"><p class="eyebrow"><i></i> From start to finish</p><h2>What to expect<span class="accent">.</span></h2><Steps/><EstimateLink service={service.slug}/></div></section>
+</Layout>

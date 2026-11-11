@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import Media from '../../components/Media.astro';
+import Icon from '../../components/Icon.astro';
+import Closing from '../../components/Closing.astro';
+import { services } from '../../lib/content';
+---
+<Layout title="Services" description="Explore roof replacement, roof repair, storm damage, siding, and gutters.">
+  <PageIntro label="01 / What we do" title="Roofing & exterior services" description="Start with what you’ve noticed. We’ll help you understand how the roof, siding, and gutters work together and where your home needs attention."/>
+  <section class="wrap sub-card-grid section-space" aria-label="All services">
+    {services.map((item,index) => <article class="sub-card"><a href={`/services/${item.slug}/`}><div class="sub-card-image"><Media name={item.image} sizes="(min-width: 768px) 43vw, 92vw"/></div><span class="eyebrow">Service / 0{index + 1}</span><h2>{item.name}</h2><p>{item.summary}</p><span class="text-link">View service <Icon size={16}/></span></a></article>)}
+  </section>
+  <Closing/>
+</Layout>
